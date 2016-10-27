@@ -1,1 +1,9 @@
-sg.json
+{
+	"stacks": [{
+		"stack_name": "SG1",
+		"template_path": "./sg1.json"
+	}, {
+		"stack_name": "SG2",
+		"template_path": "./sg2.json"
+	}]
+}
