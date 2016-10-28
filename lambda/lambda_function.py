@@ -29,7 +29,7 @@ def lambda_handler(event, context):
 
 
     cloudformation = boto3.client('cloudformation')
-    exist_stacks = cloudformation.list_stacks()
+    exist_stacks = cloudformation.list_stacks()['StackSummaries']
 
     print(exist_stacks)
 
@@ -38,6 +38,15 @@ def lambda_handler(event, context):
         print(stack['template_path'])
 
         template = open('/tmp/aws-cfn-lambda-test-master/' + stack['template_path'])
+
+        if len(filter(lambda x: x['StackName'] == stack['stack_name'], exist_stacks)))
+            print("Stack " + stack['stack_name'] + " is already exists.")
+            print("UpdateStack ...")
+            cloudformation.update_stack( StackName=stack['stack_name'], TemplateBody=template.read() )
+            next
+
+        print("Stack " + stack['stack_name'] + " is not exists.")
+        print("CreateStack ...")
         cloudformation.create_stack( StackName=stack['stack_name'], TemplateBody=template.read() )
 
     return "Fin."
