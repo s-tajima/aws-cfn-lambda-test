@@ -27,7 +27,18 @@ def lambda_handler(event, context):
     jsonData = json.load(f)
     f.close()
 
-    print(jsonData['stacks']
+
+    cloudformation = boto3.client('cloudformation')
+    exist_stacks = cloudformation.list_stacks()
+
+    print(exist_stacks)
+
+    for stack in jsonData['stacks']:
+        print(stack['stack_name'])
+        print(stack['template_path'])
+
+        template = open('/tmp/aws-cfn-lambda-test-master/' + stack['template_path'])
+        cloudformation.create_stack( StackName=stack['stack_name'], TemplateBody=template.read() )
 
     return "Fin."
 
