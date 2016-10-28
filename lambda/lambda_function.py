@@ -39,7 +39,7 @@ def lambda_handler(event, context):
 
         template = open('/tmp/aws-cfn-lambda-test-master/' + stack['template_path'])
 
-        if len(filter(lambda x: x['StackName'] == stack['stack_name'], exist_stacks)))
+        if len(filter(lambda x: x['StackName'] == stack['stack_name'], exist_stacks)):
             print("Stack " + stack['stack_name'] + " is already exists.")
             print("UpdateStack ...")
             cloudformation.update_stack( StackName=stack['stack_name'], TemplateBody=template.read() )

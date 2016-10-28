@@ -17,4 +17,7 @@ invoke:
 	aws lambda invoke --function-name testFunction /tmp/outfile.txt
 	cat /tmp/outfile.txt
 
+travis_env:
+	echo $(TRAVIS_BRANCH)
+
 travis: setup invoke
