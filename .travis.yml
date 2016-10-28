@@ -1,2 +1,5 @@
+before_install:
+    - export PATH=$PATH:$HOME/.local/bin
+
 script:
     - make travis
