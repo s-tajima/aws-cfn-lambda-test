@@ -20,4 +20,4 @@ invoke:
 travis_env:
 	echo $(TRAVIS_BRANCH)
 
-travis: setup invoke
+travis: travis_env setup invoke
