@@ -1,3 +1,4 @@
+export PATH=$PATH:$HOME/.local/bin
 
 zip:
 	(cd lambda && zip -r - *) > lambda.zip
@@ -11,6 +12,6 @@ up:
 	aws lambda update-function-code --function-name testFunction --zip-file fileb://lambda.zip
 
 travis:
-	pip install awscli
+	pip install --user awscli
 	aws lambda invoke --function-name testFunction
 
