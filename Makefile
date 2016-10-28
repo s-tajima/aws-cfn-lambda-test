@@ -9,9 +9,12 @@ test:
 up:
 	aws lambda update-function-code --function-name testFunction --zip-file fileb://lambda.zip
 
-env:
-	echo $(PATH)
 
-travis:
+setup:
 	pip install --user awscli
-	aws lambda invoke --function-name testFunction
+
+invoke:
+	aws lambda invoke --function-name testFunction /tmp/outfile.txt
+	cat /tmp/outfile.txt
+
+travis: setup invoke
