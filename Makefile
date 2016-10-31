@@ -14,7 +14,7 @@ setup:
 	pip install --user awscli
 
 invoke:
-	aws lambda invoke --function-name testFunction /tmp/outfile.txt
+	aws lambda invoke --function-name testFunction --payload "{\"TRAVIS_EVENT_TYPE\":\"${TRAVIS_EVENT_TYPE}\", \"TRAVIS_PULL_REQUEST\":\"${TRAVIS_PULL_REQUEST}\" }" /tmp/outfile.txt
 	cat /tmp/outfile.txt
 
 travis_env:
