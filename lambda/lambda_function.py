@@ -1,4 +1,5 @@
 from __future__ import print_function
+from pprint import pprint
 import json
 import boto3
 import urllib
@@ -8,6 +9,8 @@ import zipfile
 print('Loading function')
 
 def lambda_handler(event, context):
+    pprint(event)
+
     l = boto3.client('lambda')
     response = l.get_function_configuration(FunctionName=context.function_name)
     print(response['Description'])
@@ -39,15 +42,17 @@ def lambda_handler(event, context):
 
         template = open('/tmp/aws-cfn-lambda-test-master/' + stack['template_path'])
 
-        if len(filter(lambda x: x['StackName'] == stack['stack_name'], exist_stacks)):
-            print("Stack " + stack['stack_name'] + " is already exists.")
-            print("UpdateStack ...")
-            cloudformation.update_stack( StackName=stack['stack_name'], TemplateBody=template.read() )
+        if len(filter(lambda x: x['StackName'] == stack['stack_name'], exist_stacks)) == 0:
+            print("Stack " + stack['stack_name'] + " is not exists.")
+            print("CreateStack ...")
+            cloudformation.create_stack( StackName=stack['stack_name'], TemplateBody=template.read() )
             next
 
-        print("Stack " + stack['stack_name'] + " is not exists.")
-        print("CreateStack ...")
-        cloudformation.create_stack( StackName=stack['stack_name'], TemplateBody=template.read() )
+        if event["TRAVIS_EVENT_TYPE"] == "pull_request":
+            print("Stack " + stack['stack_name'] + " is already exists.")
+            print("CreateChangeSet ...")
+            cloudformation.create_change_set( StackName=stack['stack_name'], TemplateBody=template.read(), ChangeSetName=stack['stack_name'] + event["TRAVIS_PULL_REQUEST"] )
+            next
 
     return "Fin."
 
