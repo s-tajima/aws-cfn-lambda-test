@@ -40,18 +40,31 @@ def lambda_handler(event, context):
         print(stack['stack_name'])
         print(stack['template_path'])
 
-        template = open('/tmp/aws-cfn-lambda-test-master/' + stack['template_path'])
+        template = open('/tmp/aws-cfn-lambda-test-master/' + stack['template_path'], 'r')
+        new_template_json = template.read()
+        new_template_dict = json.loads(new_template_json)
 
         if len(filter(lambda x: x['StackName'] == stack['stack_name'], exist_stacks)) == 0:
             print("Stack " + stack['stack_name'] + " is not exists.")
             print("CreateStack ...")
-            cloudformation.create_stack( StackName=stack['stack_name'], TemplateBody=template.read() )
+            cloudformation.create_stack( StackName=stack['stack_name'], TemplateBody=new_template_json )
             next
 
+        current_template = cloudformation.get_template( StackName=stack['stack_name'] )['TemplateBody']
+        if current_template == new_template_dict:
+            print("Template is not updated.")
+            next
+
+        change_sets = cloudformation.list_change_sets( StackName=stack['stack_name'] )['Summaries']
+        pprint(change_sets)
+
         if event["TRAVIS_EVENT_TYPE"] == "pull_request":
+            for change_set in change_sets:
+                cloudformation.delete_change_set( ChangeSetName=change_set["ChangeSetId"] )
+
             print("Stack " + stack['stack_name'] + " is already exists.")
             print("CreateChangeSet ...")
-            cloudformation.create_change_set( StackName=stack['stack_name'], TemplateBody=template.read(), ChangeSetName=stack['stack_name'] + event["TRAVIS_PULL_REQUEST"] )
+            cloudformation.create_change_set( StackName=stack['stack_name'], TemplateBody=new_template_json, ChangeSetName=stack['stack_name'] + "-" + event["TRAVIS_PULL_REQUEST"] )
             next
 
     return "Fin."
